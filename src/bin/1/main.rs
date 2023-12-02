@@ -3,10 +3,9 @@ use std::{
     error::Error,
     fs::File,
     io::{self, BufRead},
-    ops::Index,
 };
 
-fn str_to_num(s: String) -> u128 {
+fn str_to_num(s: &str) -> u128 {
     let l = s
         .par_char_indices()
         .filter(|(_num, ch)| char::is_numeric(*ch))
