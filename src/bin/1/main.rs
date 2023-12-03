@@ -5,15 +5,17 @@ use std::{
     io::{self, BufRead},
 };
 
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
+
 fn str_to_num(s: &str) -> u128 {
     let l = s
-        .par_char_indices()
+        .char_indices()
         .filter(|(_num, ch)| char::is_numeric(*ch))
         .min_by_key(|(num, _ch)| *num)
         .unwrap()
         .1;
     let r = s
-        .par_char_indices()
+        .char_indices()
         .filter(|(_num, ch)| char::is_numeric(*ch))
         .max_by_key(|(num, _ch)| *num)
         .unwrap()
@@ -61,25 +63,16 @@ fn str_to_num_2(s: &str) -> Option<u128> {
     let max = indices.iter().max()?.1;
     Some(format!("{min}{max}").parse::<u128>().unwrap())
 }
-use rayon::{iter::ParallelIterator, str::ParallelString};
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let num: u128 = io::BufReader::new(File::open("src/bin/1/input.txt")?)
+    let lines: Vec<String> = io::BufReader::new(File::open("src/bin/1/input.txt")?)
         .lines()
-        .map(std::result::Result::unwrap)
-        .map(String::from)
-        .map(str_to_num)
-        .sum();
+        .collect::<Result<Vec<String>, _>>()?;
+
+    let num: u128 = lines.par_iter().map(|x| str_to_num(x)).sum();
     println!("{num}");
 
-    let num2: u128 = io::BufReader::new(File::open("src/bin/1/input.txt")?)
-        .lines()
-        .map(std::result::Result::unwrap)
-        .map(String::from)
-        .map(|s| (s.clone(),str_to_num_2(&s).unwrap()))
-        .inspect(|f| println!("{f:?}"))
-        .map(|(s,v)|v)
-        .sum();
+    let num2: u128 = lines.par_iter().map(|s| (str_to_num_2(s).unwrap())).sum();
     println!("{num2}");
     Ok(())
 }
