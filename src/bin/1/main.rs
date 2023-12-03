@@ -65,9 +65,7 @@ fn str_to_num_2(s: &str) -> Option<u128> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let lines: Vec<String> = io::BufReader::new(File::open("src/bin/1/input.txt")?)
-        .lines()
-        .collect::<Result<Vec<String>, _>>()?;
+    let lines = aoc::input::lines(1)?;
 
     let num: u128 = lines.par_iter().map(|x| str_to_num(x)).sum();
     println!("{num}");
